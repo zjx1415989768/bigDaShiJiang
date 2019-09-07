@@ -9,6 +9,9 @@
     <link rel="stylesheet" type="text/css" href="css/reset.css">
     <link rel="stylesheet" type="text/css" href="css/iconfont.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" href="./js/bootstrap/css/bootstrap.min.css">
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <script src="./js/bootstrap/js/bootstrap.min.js"></script>
 </head>
 
 <body>
@@ -25,12 +28,75 @@
                 <i class="iconfont icon-key"></i>
                 <input type="text" class="input_txt" placeholder="邮箱/手机号">
                 <input type="password" class="input_pass" placeholder="密码">
-                <input type="submit" class="input_sub" value="登 录">
+                <input type="button" class="input_sub" value="登 录">
             </form>
         </div>
 
-    </div> 
+    </div>
 
+    <!-- 模态框 -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">系统提示</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- <p>One fine body&hellip;</p> -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+                    <!-- <button type="button" class="btn btn-primary">确定</button> -->
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 </body>
+
+<script>
+    // 模态框调用封装
+    function showModal(text, fun) {
+        $('#myModal').modal({ keyboard: true });
+        $('.modal-body').text(text);
+        if (fun && fun instanceof Function) {
+            setTimeout(fun, 2000);
+        };
+    };
+    /* 思路分析:
+        1. 给按钮注册点击事件
+        2. 获取文本框内容
+        3. 发送ajax请求
+        5. 登录成功后跳转到首页
+     */
+    $('.input_sub').click(function () {
+        //2. 获取文本框内容
+        var username = $('.input_txt').val().trim();
+        var password = $('.input_pass').val().trim();
+
+        //设置用户名和密码不能为空
+        if (username == '' || password == '') {
+            showModal('账号或密码不能为空~~~~~');
+            $('.input_txt').focus();
+            return;
+        };
+        $.ajax({
+            url: 'http://127.0.0.1:8080/admin/user/login',
+            method: 'post',
+            data: 'username=' + username + '&password=' + password,
+            success: function (backData) {
+                showModal(backData.msg, function () {
+                    if (backData.code == 200) {
+                        window.location.href = './index.html';
+                    } else {
+                        $('.input_txt').focus();
+                    };
+                });
+            }
+        });
+    });
+
+</script>
 
 </html>
